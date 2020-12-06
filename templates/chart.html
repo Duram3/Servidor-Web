@@ -1,0 +1,86 @@
+<!DOCTYPE HTML>
+<title>Monitor de Actividad</title>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>Highstock Example</title>
+        <link type="text/css"  rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}"/>
+        <link type="text/css"  rel="stylesheet" href="{{ url_for('static', filename='Highcharts/code/css/highcharts.css') }}"/>
+        <link type="text/css"  rel="stylesheet" href="{{ url_for('static', filename='daterangepicker/daterangepicker.css') }}"/>
+        <!-- <script type="text/javascript" src="{{ url_for('static', filename='jquery.min.js') }}"></script> -->
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+        <script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+        <script src="{{ url_for('static', filename='Highcharts/code/highcharts.js') }}"></script>
+        <script src="{{ url_for('static', filename='daterangepicker/daterangepicker.js') }}"></script>
+
+        <input type="text" name="daterange" value="12/01/2020 - 12/30/2020" />
+
+        <script type="text/javascript">
+        
+        
+            $('input[name="daterange').daterangepicker({
+                    opens: 'right'
+                }, function(start, end, label) {
+                    var myDateFormat = '%y-%m-%d';
+                    console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+                    $.ajax({
+                    url: 'http://127.0.0.1:5000/aserver.ashx?start=' + start.format('YYYYMMDD') + '&end=' + end.format('YYYYMMDD'),
+                    dataType: "json",
+                    data: $.get('http://127.0.0.1:5000/aserver.ashx'),
+                    success: function (data) {
+                        $totalGrafico = implode(",", $data);
+                        console.log(data)
+                        $('#container').highcharts({
+                            chart: {
+                            type: 'line',  
+                            borderWidth: 1 
+                        },
+                        xAxis: {
+                            title: {
+                                enabled: true,
+                                text: 'Fecha'
+                                },
+                                type: 'datetime',
+                                /*dateTimeLabelFormats: { 
+                                    year: myDateFormat,
+                                    month: myDateFormat,
+                                    day: myDateFormat, 
+                                    hour: myDateFormat,  
+                                    minute: myDateFormat,
+                                    second: myDateFormat,     
+                                    millisecond: myDateFormat 
+                                    },*/
+                                    //min: Date.UTC(start),
+                                    //max: Date.UTC(end)
+            
+                            },
+                            title: {
+                                text: 'MAC address monitor'
+                            },
+                            plotOptions: {
+                                line: {
+                                dataLabels: {
+                                    enabled: true
+                                }}},
+                            
+                            series : [{
+                                name : 'Día',
+                                data : data,
+                                tooltip: {
+                                    valueDecimals: 2
+                                }
+                            }]
+                     
+                       });
+                       }
+                }); 
+
+            });
+        
+        </script>
+    </head>
+    <body>
+        <div id="container" style="width: 80%; height: 500px; margin: 100 auto;float:left;"></div>
+    
+    </body>
+</html>

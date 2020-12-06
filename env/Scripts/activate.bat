@@ -33,4 +33,4 @@ if defined _OLD_CODEPAGE (
 )
 
 
-set "FLASK_APP=server.py"
+set "FLASK_APP=serverTest.py"
