@@ -1,1 +1,1 @@
-Código para el servidor TCP, proyecto "Sistema de Detección de Dispositivos Basado en Búsqueda Activa de WiFi"
+Código para el servidor que muestra la información recolectada, extraída de la base de datos. Proyecto "Sistema de Detección de Dispositivos Basado en Búsqueda Activa de WiFi"
