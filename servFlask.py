@@ -41,20 +41,6 @@ def recibir():
     except Exception as e:
         print("Error al intentar consultar a la base")
         return(str(e))
-
-
-@app.route('/data.json')
-def data():
-    try:
-        c, conn = connection()   
-        consulta='SELECT Date(Instante), count(*) FROM registros WHERE DATE(Instante) >= %s AND DATE(Instante) <= %s GROUP BY Date(Instante)'
-        param=(startdate, enddate)
-        c.execute(consulta, param)
-        results = c.fetchall()
-        print (results)
-        return json.dumps(results, indent=4, sort_keys=True, default=str)
-    except Exception as e:
-        return(str(e))
 		
 if __name__ == "__main__":
     app.run()
