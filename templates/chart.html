@@ -12,35 +12,60 @@
         <script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
         <script src="{{ url_for('static', filename='Highcharts/code/highcharts.js') }}"></script>
         <script src="{{ url_for('static', filename='daterangepicker/daterangepicker.js') }}"></script>
+        <script src="{{ url_for('static', filename='Highcharts/code/modules/marker-clusters.js') }}"></script>
+        <link href="https://unpkg.com/bootstrap-table@1.18.3/dist/bootstrap-table.min.css" rel="stylesheet">
+        <script src="https://unpkg.com/bootstrap-table@1.18.3/dist/bootstrap-table.min.js"></script>
 
-        <input type="text" name="daterange" value="12/01/2020 - 12/30/2020" />
+        <form class="form-control">
+            <div class="form-group">
+                <input type="text" name="daterange" value="03/01/2021 - 04/30/2021" />
+            </div>
+        </form>
 
         <script type="text/javascript">
-        
         
             $('input[name="daterange').daterangepicker({
                     opens: 'right'
                 }, function(start, end, label) {
                     console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
                     $.ajax({
-                    url: 'http://127.0.0.1:5000/aserver.ashx?start=' + start.format('YYYYMMDD') + '&end=' + end.format('YYYYMMDD'),
+                    url: 'http://127.0.0.1:5000/diatodos?start=' + start.format('YYYYMMDD') + '&end=' + end.format('YYYYMMDD'),
                     dataType: "json",
-                    data: $.get('http://127.0.0.1:5000/aserver.ashx'),
+                    data: $.get('http://127.0.0.1:5000/diatodos'),
                     success: function (data) {
-                        console.log(data)
+                        var myDateFormat = '%e/%m/%y';
+                        var categorias = []
+                        for (i = 0; i < data.length; i++){
+                            categorias.push(data[i][0]);
+                        }
                         $('#container').highcharts({
                             chart: {
                             type: 'line',  
                             borderWidth: 1 
                         },
                             title: {
-                                text: 'MAC address monitor'
+                                text: 'Detecciones por día'
+                            },
+                            subtitle: {
+                                text: 'Todos',
                             },
                             plotOptions: {
                                 line: {
                                 dataLabels: {
                                     enabled: true
-                                }}},
+                                },
+                                color: 'blue',
+                            }},
+                            xAxis: {
+                                categories: categorias,
+                                type: 'datetime',
+                                        dateTimeLabelFormats: {
+                                            day: '%Y %b'
+                                        }
+                                    },
+                            credits: {
+                                enabled: false
+                            },
                             
                             series : [{
                                 name : 'Cantidad de dirs. MAC por día',
@@ -51,15 +76,425 @@
                             }]
                      
                        });
+
                        }
                 }); 
 
-            });
+
+
+                $.ajax({
+                    url: 'http://127.0.0.1:5000/diamovil?start=' + start.format('YYYYMMDD') + '&end=' + end.format('YYYYMMDD'),
+                    dataType: "json",
+                    data: $.get('http://127.0.0.1:5000/diamovil'),
+                    success: function (data) {
+                        var categorias = []
+                        for (i = 0; i < data.length; i++){
+                            categorias.push(data[i][0]);
+                        }
+                        $('#containerII').highcharts({
+                            chart: {
+                            type: 'line',  
+                            borderWidth: 1 
+                        },
+                            title: {
+                                text: 'Detecciones por día'
+                            },
+                            subtitle: {
+                                text: 'Sólo Móviles',
+                            },                        
+                            plotOptions: {
+                                line: {
+                                dataLabels: {
+                                    enabled: true
+                                },
+                                color: 'green'
+                            }},
+
+                            xAxis: {
+                                categories: categorias,
+                                type: 'datetime'
+                                },
+                            
+                            series : [{
+                                name : 'Cantidad de dirs. MAC por día',
+                                data : data,
+                                tooltip: {
+                                    valueDecimals: 2
+                                }
+                            }]
+                     
+                       });
+
+                       }
+                });
+
+
+                $.ajax({
+                    url: 'http://127.0.0.1:5000/ouitodos?start=' + start.format('YYYYMMDD') + '&end=' + end.format('YYYYMMDD'),
+                    dataType: "json",
+                    dataII: $.get('http://127.0.0.1:5000/ouitodos'),
+                    success: function (dataII) {
+
+                        
+                        $('#pie').highcharts({
+                            chart: {
+                                type: 'pie',
+                                borderWidth: 1
+                            },
+                            
+                            title: {
+                                text: 'Detecciones por Fabricante',
+                            },
+                            subtitle: {
+                                text: 'Todos',
+                            },
+                            tooltip: {
+                                pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                            },
+                            series : [{
+                                name : 'OUI',
+                                data : dataII,
+                                tooltip: {
+                                    valueDecimals: 2
+                                }
+                            }]
+                        });
+
+                       }
+                }); 
+
+
+                $.ajax({
+                    url: 'http://127.0.0.1:5000/ouimoviles?start=' + start.format('YYYYMMDD') + '&end=' + end.format('YYYYMMDD'),
+                    dataType: "json",
+                    dataII: $.get('http://127.0.0.1:5000/ouimoviles'),
+                    success: function (dataII) {
+
+                        
+                        $('#pieII').highcharts({
+                            chart: {
+                                type: 'pie',
+                                borderWidth: 1
+                            },
+                            
+                            title: {
+                                text: 'Detecciones por Fabricante',
+                            },
+                            subtitle: {
+                                text: 'Sólo Móviles',
+                            },
+                            tooltip: {
+                                pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                            },
+                            series : [{
+                                name : 'OUI',
+                                data : dataII,
+                                tooltip: {
+                                    valueDecimals: 2
+                                }
+                            }]
+                        });
+
+
+
+                       }
+                });
+
+                $.ajax({
+                    url: 'http://127.0.0.1:5000/dispmoviles?start=' + start.format('YYYYMMDD') + '&end=' + end.format('YYYYMMDD'),
+                    dataType: "json",
+                    data: $.get('http://127.0.0.1:5000/dispmoviles'),
+                    success: function (data) {
+                        var categorias = []
+                        for (i = 0; i < data.length; i++){
+                            categorias.push(data[i][0]);
+                        }                        
+                        $('#bar').highcharts({
+                            chart: {
+                                type: 'column',
+                                borderWidth: 1
+                            },
+                            title: {
+                                text: 'Detecciones por Dispositivo',
+                            },
+                            subtitle: {
+                                text: 'Sólo Móviles',
+                            },
+                            xAxis: {
+                                categories: categorias,
+                                type: 'text',
+                                label: data[0].series
+                            },
+                            series : [{
+                                name : 'Detección por dirección',
+                                data : data,
+                                tooltip: {
+                                    valueDecimals: 2
+                                }
+                            }]
+                        });
+
+
+
+                       }
+                });
+
+
+                $.ajax({
+                    url: 'http://127.0.0.1:5000/all.ashx?start=' + start.format('YYYYMMDD') + '&end=' + end.format('YYYYMMDD'),
+                    dataType: "json",
+                    dataIII: $.get('http://127.0.0.1:5000/all.ashx'),
+                    success: function (dataIII) {
+                        var $table = $('#table');                       
+                        $('#table').bootstrapTable({
+                            data: dataIII
+                        });
+
+                       }
+                }); 
+
+
+                $.ajax({
+                    url: 'http://127.0.0.1:5000/dwell?start=' + start.format('YYYYMMDD') + '&end=' + end.format('YYYYMMDD'),
+                    dataType: "json",
+                    datadw: $.get('http://127.0.0.1:5000/dwell'),
+                    success: function (datadw) {
+                        console.log(datadw)
+                        var categorias = []
+                        for (i = 0; i < datadw.length; i++){
+                            categorias.push(datadw[i][0]);
+                        }
+
+                        $('#km').highcharts({
+                            chart: {
+                                type: 'scatter'//,
+                                //zoomType: 'xy',
+                                //height: '100%'
+                            },
+                            title: {
+                                text: 'Tiempo de permanencia'
+                            },
+                            xAxis: {
+                                title: {
+                                text: 'Hora de primera detección'
+                                },
+                                categories: categorias,
+                                gridLineWidth: 1
+                            },
+                            yAxis: {
+                                title: {
+                                text: 'Tiempo (minutos)'
+                                }
+                            },
+
+                            legend: {
+                                enabled: false
+                            },
+                            plotOptions: {
+                                series: {
+                                    dataLabels: {
+                                        enabled: true,
+                                        pointFormat: ''
+                                    },
+                                    cluster: {
+                                        enabled: false,
+                                        minimumClusterSize: 2,
+                                        allowOverlap: false,
+                                        layoutAlgorithm: {
+                                            type: 'kmeans',
+                                            gridSize: 100
+                                        },
+                                        layoutAlgorithm: {
+                                            type: 'kmeans',
+                                            gridSize: 70
+                                            },
+                                        dataLabels: {
+                                            style: {
+                                                fontSize: '8px'
+                                            },
+                                            y: -1
+                                        },
+                                        zones: [{
+                                            from: 0,
+                                            to: 2,
+                                            marker: {
+                                                fillColor: '#33FFF3',
+                                                radius: 13
+                                            }
+                                        }, {
+                                            from: 3,
+                                            to: 30,
+                                            marker: {
+                                                fillColor: '#D7FF33',
+                                                radius: 15
+                                            }
+                                        }, {
+                                            from: 31,
+                                            to: 60,
+                                            marker: {
+                                                fillColor: '#FFAF33',
+                                                radius: 20
+                                            }
+                                        }, {
+                                            from: 60,
+                                            to: 200,
+                                            marker: {
+                                                fillColor: '#FF8D33',
+                                                radius: 20
+                                            }
+                                        }]
+                                    }
+                                }
+                            },
+                            series: [{
+                                type: 'scatter',
+                                color: 'red',
+                                data: datadw
+                            }]
+                        });
+                
+
+                        $('#kmII').highcharts({
+                            chart: {
+                                type: 'scatter'//,
+                                //zoomType: 'xy',
+                                //height: '100%'
+                            },
+                            title: {
+                                text: 'Marker clusters demo'
+                            },
+                            xAxis: {
+                                categories: categorias,
+                                title: {
+                                    text: 'Hora de primera detección'
+                                }
+                            },
+                            yAxis: {
+                                title: {
+                                    text: 'Tiempo (minutos)'
+                                }
+                            },
+                            legend: {
+                                enabled: false
+                            },
+                            plotOptions: {
+                                series: {
+                                    dataLabels: {
+                                        enabled: true,
+                                        pointFormat: ''
+                                    },
+                                    cluster: {
+                                        enabled: true,
+                                        minimumClusterSize: 2,
+                                        allowOverlap: false,
+                                        layoutAlgorithm: {
+                                            type: 'kmeans',
+                                            distance: '20%'
+                                            //gridSize: 300
+                                        },
+                                        dataLabels: {
+                                            style: {
+                                                fontSize: '8px'
+                                            },
+                                            y: -1
+                                        },
+                                        zones: [{
+                                            from: 0,
+                                            to: 2,
+                                            marker: {
+                                                fillColor: '#33FFF3',
+                                                radius: 20
+                                            }
+                                        }, {
+                                            from: 3,
+                                            to: 5,
+                                            marker: {
+                                                fillColor: '#D7FF33',
+                                                radius: 30
+                                            }
+                                        }, {
+                                            from: 6,
+                                            to: 10,
+                                            marker: {
+                                                fillColor: '#FFAF33',
+                                                radius: 50
+                                            }
+                                        }, {
+                                            from: 11,
+                                            to: 20,
+                                            marker: {
+                                                fillColor: '#FF8D33',
+                                                radius: 80
+                                            }
+                                        }]
+                                    }
+                                }
+                            },
+                            series: [{
+                                type: 'scatter',
+                                color: 'red',
+                                data: datadw
+                            }]
+                        });
+                    }
+                }); 
+
+
+                    
+        });
+
+        
+
+
+
+
         
         </script>
+        <style>
+
+        * {
+        font-family: "Helvetica";
+        font-weight: 200;
+        }
+        body {
+        background: rgb(1, 16, 39);
+        }
+        h1 {
+        text-align: center;
+        margin-top: 40vh;
+        color: rgb(255, 255, 255);
+        }
+        div {
+        display: flex;
+        justify-content: center;
+        }
+        button {
+        padding: 10px;
+        background-color: rgb(255, 255, 255);
+        color: rgb(0, 0, 0);
+        border: none;
+        border-radius: 3px;
+        -webkit-border-radius: 3px;
+        -moz-border-radius: 3px;
+        -ms-border-radius: 3px;
+        -o-border-radius: 3px;
+        font-size: 1em;
+        }
+        button:hover {
+        background: rgb(45, 50, 102);
+        color: rgb(255, 255, 255);
+        }
+
+        </style>
     </head>
     <body>
-        <div id="container" style="width: 80%; height: 500px; margin: 100 auto;float:left;"></div>
-    
+        <div class="container" id="container" style="width: 50%; height: 500px; margin: 100 auto;float:left;"></div>
+        <div class="container" id="containerII" style="width: 50%; height: 500px; margin: 100 auto;float:right;"></div>
+        <div class="container" id="pie" style="width: 50%; height: 500px; margin: 100 auto;float:left;"></div>
+        <div class="container" id="pieII" style="width: 50%; height: 500px; margin: 100 auto;float:right;"></div>
+        <div class="container" id="km" style="width: 100%; height: 500px; margin: 100 auto;float:center;"></div>
+        <div class="container" id="kmII" style="width: 100%; height: 500px; margin: 100 auto;float:center;"></div>
+        <div class="container" id="bar" style="width: 100%; height: 800px; margin: 100 auto;float:center;"></div>
+          
     </body>
 </html>
